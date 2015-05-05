@@ -1,0 +1,32 @@
+<div id="main-content" class="card">
+  <header>
+    <h1 id="fxa-permissions-header">{{#t}}%(serviceName)s would like to know…{{/t}}</h1>
+  </header>
+
+  <section>
+    <div class="error"></div>
+    <div class="success"></div>
+
+    <div id="permissions">
+      <p>
+        <span>{{#t}}Email{{/t}}</span>
+        <span class="email">{{ email }}</span>
+      </p>
+    </div>
+
+    <div class="privacy-links">
+      {{#t}}By proceeding, I agree to the <a id="service-tos" href="%(termsUri)s">Terms of Service</a> and <a id="service-pp" href="%(privacyUri)s">Privacy Notice</a> of %(serviceName)s (%(serviceUri)s).{{/t}}
+    </div>
+
+    <form novalidate>
+      <div class="button-row">
+        <button id="proceed" type="submit">{{#t}}Proceed{{/t}}</button>
+      </div>
+    </form>
+
+    <ul class="links">
+      <li><a href="#" id="back">{{#t}}Cancel{{/t}}</a>
+    </ul>
+
+  </section>
+</div>

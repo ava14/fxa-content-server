@@ -27,7 +27,8 @@ define([
     verified: undefined,
     profileImageUrl: undefined,
     profileImageId: undefined,
-    lastLogin: undefined
+    lastLogin: undefined,
+    grantedPermissions: undefined
   };
 
   var DEFAULTS = _.extend({
@@ -174,6 +175,54 @@ define([
         .then(function () {
           return profileImage;
         });
+    },
+
+    signIn: function (relier) {
+      var self = this;
+      return p().then(function () {
+        var password = self.get('password');
+        var sessionToken = self.get('sessionToken');
+        var email = self.get('email');
+
+        if (password) {
+          return self._fxaClient.signIn(email, password, relier);
+        } else if (sessionToken) {
+          // We have a cached Sync session so just check that it hasn't expired.
+          // The result includes the latest verified state
+          return self._fxaClient.recoveryEmailStatus(sessionToken);
+        } else {
+          throw AuthErrors.toError('UNEXPECTED_ERROR');
+        }
+      })
+      .then(function (updatedSessionData) {
+        self.set(updatedSessionData);
+
+        if (! self.get('verified')) {
+          return self._fxaClient.signUpResend(relier, self.get('sessionToken'));
+        }
+      });
+    },
+
+    signUp: function (relier) {
+      var self = this;
+      return self._fxaClient.signUp(self.get('email'), self.get('password'), relier,
+        {
+          customizeSync: self.get('customizeSync')
+        })
+        .then(function (updatedSessionData) {
+          self.set(updatedSessionData);
+        });
+    },
+
+    saveGrantedPermissions: function (clientId, scope) {
+      var permissions = this.get('permissions') || {};
+      permissions[clientId] = scope;
+      this.set('permissions', permissions);
+    },
+
+    hasGrantedPermissions: function (clientId, scope) {
+      var permissions = this.get('permissions') || {};
+      return permissions[clientId] === scope;
     }
   });
 
