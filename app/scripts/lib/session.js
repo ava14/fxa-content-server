@@ -41,7 +41,22 @@ define([
         // ignore the parse error.
       }
 
-      this.set(values);
+      // Update new values, without overwriting items on the prototype.
+      _.each(values, function (value, key) {
+        if (! Session.prototype.hasOwnProperty(key)) {
+          this[key] = value;
+        }
+      }, this);
+
+      // Clear values that no longer exist in storage.
+      _.each(this, function (value, key) {
+        if (! Session.prototype.hasOwnProperty(key)) {
+          if (! values.hasOwnProperty(key)) {
+            this[key] = null;
+            delete this[key];
+          }
+        }
+      }, this);
     },
 
     /**

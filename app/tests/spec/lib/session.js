@@ -89,6 +89,22 @@ function (chai, Session) {
         assert.equal(Session.key7, 'value7');
         assert.equal(Session.key8, 'value8');
       });
+
+      it('deletes keys that were cleared from storage', function () {
+        Session.set({
+          key9: 'value9',
+          key10: 'value10'
+        });
+
+        sessionStorage.setItem('__fxa_session', JSON.stringify({
+          key10: 'value10'
+        }));
+
+        Session.load();
+        assert.equal(Session.key9, 'value9');
+        assert.isUndefined(Session.key10);
+      });
+    });
     });
   });
 });
